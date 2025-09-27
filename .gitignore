@@ -1,0 +1,34 @@
+Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+build-number.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+IDE files
+.idea/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+.DS_Store
+nbproject/
+
+Logs
+*.log
+logs/
+
+Secrets - VERY IMPORTANT
+.env
+.env.
+secrets/
+
+VS Code
+.vscode/
