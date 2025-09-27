@@ -6,4 +6,6 @@
 rootProject.name = "payments-platform"
 
 // We will add our microservices here as we create them, for example:
-// include("services:identity-service")
+ include("services:identity-service")
+ include("services:discovery-service")
+ include("services:api-gateway")

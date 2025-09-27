@@ -1,0 +1,24 @@
+# This file defines the infrastructure services needed for local development.
+# It allows us to start our entire backend environment with a single command.
+services:
+  # -------------------- DATABASE --------------------
+  # Defines our primary PostgreSQL database service.
+  postgres:
+    image: postgres:16-alpine
+    container_name: payments_postgres
+    environment:
+      # These variables configure the database on its first run.
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=payments_db
+    ports:
+      # Maps your local machine's port 5432 to the container's port 5432.
+      - "5432:5432"
+    volumes:
+      # Persists the database data on your machine, so it's not lost when the container stops.
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+# This declares a 'named volume' that Docker will manage for persisting our data.
+volumes:
+  postgres-data: {}

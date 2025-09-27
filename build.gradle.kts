@@ -1,65 +1,63 @@
-/*
- * This is the root build file for the entire monorepo.
- * It configures settings, plugins, and dependency versions that will be
- * shared across all microservices.
- */
-import org.gradle.api.plugins.JavaPluginExtension
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.allopen.gradle.AllOpenExtension
+import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
 
 plugins {
-    // Apply the Spring Boot plugin to manage Spring Boot dependencies and build executable jars.
+    // Make the Spring Boot plugin available to sub-projects
     id("org.springframework.boot") version "3.3.0" apply false
-
-    // Apply the Spring Dependency Management plugin to import Spring's BOM (Bill of Materials).
-    id("io.spring.dependency-management") version "1.1.5"
-
-    // Apply the Kotlin JVM plugin to add support for Kotlin.
+    // Make the Spring Dependency Management plugin available to sub-projects
+    id("io.spring.dependency-management") version "1.1.5" apply false
+    // Make the Kotlin for JVM plugin available to sub-projects
     id("org.jetbrains.kotlin.jvm") version "2.0.0" apply false
+    // Make the Kotlin JPA plugin available to sub-projects
+    id("org.jetbrains.kotlin.plugin.jpa") version "2.0.0" apply false
+    // Make the All-Open plugin available
+    id("org.jetbrains.kotlin.plugin.allopen") version "2.0.0" apply false
 }
 
-// Configure all subprojects (our microservices) with common settings.
+// This block configures settings for all our microservice sub-projects
 subprojects {
-    // Apply necessary plugins for each microservice.
+    // Apply the necessary plugins to each microservice
     apply(plugin = "org.springframework.boot")
     apply(plugin = "io.spring.dependency-management")
     apply(plugin = "org.jetbrains.kotlin.jvm")
-    // Explicitly apply the java-library plugin to make the 'java' extension available.
-    apply(plugin = "java-library")
+    apply(plugin = "org.jetbrains.kotlin.plugin.jpa")
+    apply(plugin = "org.jetbrains.kotlin.plugin.allopen")
 
-    // Set group and version for all microservices.
+    // Set a standard group and version for all services
     group = "com.payments.platform"
-    version = "1.0.0-SNAPSHOT"
+    version = "0.0.1-SNAPSHOT"
 
-    // Set the Java version. Java 21 is the latest Long-Term Support (LTS) version
-    // and is fully compatible with Spring Boot 3.3.
-    // This type-safe approach resolves the 'unresolved reference' errors.
-    configure<JavaPluginExtension> {
-        sourceCompatibility = JavaVersion.VERSION_21
-    }
-
-    // Configure Kotlin options for all microservices using the modern compilerOptions DSL.
-    tasks.withType<KotlinCompile> {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
-        }
-    }
-
-    // Define the repositories where dependencies will be fetched from.
+    // Define where to download dependencies from. This fixes the "Could not resolve" error.
     repositories {
         mavenCentral()
     }
 
-    // This block is the Gradle equivalent of <dependencyManagement> in Maven.
-    // It centrally manages the versions of our dependencies.
-    dependencyManagement {
-        imports {
-            // Import the Spring Boot Bill of Materials (BOM)
-            mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+    // Configure Java compatibility for all services
+    configure<JavaPluginExtension> {
+        sourceCompatibility = JavaVersion.VERSION_21
+    }
 
-            // Import the Spring Cloud Bill of Materials (BOM)
+    // Configure Kotlin options for all services
+    tasks.withType<KotlinCompile> {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+        }
+    }
+
+    // Centrally manage dependency versions using Spring's Bill of Materials (BOM)
+    configure<DependencyManagementExtension> {
+        imports {
+            mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
             mavenBom("org.springframework.cloud:spring-cloud-dependencies:2023.0.2")
         }
+    }
+
+    // Configure the all-open plugin for any subproject it's applied to.
+    configure<AllOpenExtension> {
+        annotation("jakarta.persistence.Entity")
+        annotation("jakarta.persistence.MappedSuperclass")
+        annotation("jakarta.persistence.Embeddable")
     }
 }
 
