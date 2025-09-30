@@ -2,6 +2,12 @@
 .gradle/
 build/
 
+# Go Build Artifacts
+# Ignore compiled binaries (the name of our service)
+ledger-service
+# Ignore test coverage reports
+coverage.out
+
 # IDE files
 .idea/
 *.iml

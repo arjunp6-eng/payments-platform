@@ -19,6 +19,22 @@ services:
       - postgres-data:/var/lib/postgresql/data
     restart: unless-stopped
 
+  # -------------------- LEDGER SERVICE (Go) --------------------
+  ledger-service:
+    build:
+      context: ../services/ledger-service # Tells Docker to build from the Dockerfile in this path
+    container_name: payments_ledger
+    ports:
+      - "8082:8082" # Maps your port 8082 to the container's port 8082
+    environment:
+      - LEDGER_SERVICE_PORT=8082
+      # This DSN points to the postgres container over the internal Docker network
+      - LEDGER_DB_DSN=postgres://admin:password@postgres:5432/payments_db
+    depends_on:
+      - postgres # Ensures Postgres starts before the ledger service
+    restart: unless-stopped
+
 # This declares a 'named volume' that Docker will manage for persisting our data.
 volumes:
-  postgres-data: {}
+  postgres-data:
+    driver: local
