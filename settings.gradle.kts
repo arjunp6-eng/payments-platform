@@ -9,3 +9,4 @@ rootProject.name = "payments-platform"
  include("services:identity-service")
  include("services:discovery-service")
  include("services:api-gateway")
+ include("services:notification-service")

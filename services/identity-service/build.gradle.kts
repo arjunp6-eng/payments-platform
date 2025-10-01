@@ -21,6 +21,9 @@ dependencies {
     // Eureka Client for service discovery
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
 
+    // For producing messages to Kafka
+    implementation("org.springframework.kafka:spring-kafka")
+
     // Spring Boot Starter for testing.
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
