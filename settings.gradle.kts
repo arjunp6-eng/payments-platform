@@ -1,6 +1,6 @@
 /*
  * This file defines the settings for the entire project, including the root project name
- * and which sub-projects (our microservices) are included in the build.
+ * and which subprojects (our microservices) are included in the build.
  */
 
 rootProject.name = "payments-platform"
@@ -10,3 +10,5 @@ rootProject.name = "payments-platform"
  include("services:discovery-service")
  include("services:api-gateway")
  include("services:notification-service")
+ include("services:transaction-orchestrator")
+ include("services:event-dtos")

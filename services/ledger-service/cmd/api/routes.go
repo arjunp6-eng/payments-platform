@@ -2,8 +2,8 @@ package main
 
 import "net/http"
 
-// routes returns a configured http.ServeMux with all our application routes.
-func (app *application) routes() *http.ServeMux {
+// routes returns a configured http.ServeMux wrapped in our logging middleware.
+func (app *application) routes() http.Handler { // The return type is now http.Handler
 	mux := http.NewServeMux()
 
 	// Register handlers for routes. The pattern includes the HTTP method.
@@ -16,5 +16,6 @@ func (app *application) routes() *http.ServeMux {
 	mux.HandleFunc("POST /v1/transfers", app.createTransferHandler)
 	mux.HandleFunc("GET /v1/transactions/{id}", app.getTransactionHandler)
 
-	return mux
+	// Wrap the mux with the logRequest middleware.
+	return app.logRequest(mux)
 }

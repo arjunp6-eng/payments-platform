@@ -24,6 +24,8 @@ dependencies {
     // For producing messages to Kafka
     implementation("org.springframework.kafka:spring-kafka")
 
+    implementation(project(":services:event-dtos"))
+
     // Spring Boot Starter for testing.
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 

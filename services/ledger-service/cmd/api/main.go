@@ -48,10 +48,11 @@ func main() {
 		logger: logger,
 	}
 
-	// Use our new router to create a configurable server.
+	// Create a new configurable server and explicitly
+	// assign our middleware-wrapped router to its Handler.
 	srv := &http.Server{
 		Addr:    ":" + cfg.Port,
-		Handler: app.routes(), // This now calls the routes() function
+		Handler: app.routes(),
 	}
 
 	logger.Printf("starting ledger-service on port %s", cfg.Port)
