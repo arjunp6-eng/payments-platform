@@ -60,6 +60,85 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
+  # -------------------- CACHE --------------------
+  redis:
+    image: redis:7-alpine
+    container_name: payments_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+
+  # -------------------- OBJECT STORAGE --------------------
+  minio:
+    image: minio/minio:RELEASE.2023-09-07T02-05-02Z
+    container_name: payments_minio
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    ports:
+      - "9000:9000" # API port
+      - "9001:9001" # Console port
+    volumes:
+      - minio-data:/data
+    command: server /data --console-address ":9001"
+    restart: unless-stopped
+
+  # -------------------- OBSERVABILITY (METRICS) --------------------
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    container_name: payments_prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command: --config.file=/etc/prometheus/prometheus.yml
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana-oss:10.1.1
+    container_name: payments_grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    restart: unless-stopped
+
+  # -------------------- OBSERVABILITY (TRACING) --------------------
+  jaeger:
+    image: jaegertracing/all-in-one:1.48
+    container_name: payments_jaeger
+    ports:
+      - "16686:16686" # Jaeger UI
+      - "4317:4317"   # OTLP gRPC receiver
+    restart: unless-stopped
+
+  # -------------------- IDENTITY & ACCESS MANAGEMENT --------------------
+  keycloak:
+    image: quay.io/keycloak/keycloak:22.0.1
+    container_name: payments_keycloak
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    ports:
+      - "8180:8080"
+    volumes:
+      - keycloak-data:/opt/keycloak/data
+    command: start-dev
+    restart: unless-stopped
+
 volumes:
   postgres-data:
+    driver: local
+  redis-data:
+    driver: local
+  minio-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+  keycloak-data:
     driver: local
